@@ -1,7 +1,10 @@
-import React from "react";
+import { React, useContext } from "react";
 import { Link } from "react-router-dom";
+import { Context } from "../main";
 
 const Header = () => {
+  const { isAuthenticated, setIsAuthenticated } = useContext(Context);
+  console.log(isAuthenticated);
   return (
     <nav className="header">
       <div>
@@ -10,8 +13,11 @@ const Header = () => {
       <article>
         <Link to={"/"}>Home</Link>
         <Link to={"/profile"}>Profile</Link>
-        <Link to={"/login"}>Login</Link>
-        {/* <button className="btn">Login</button> */}
+        {isAuthenticated ? (
+          <button className="btn">Logout</button>
+        ) : (
+          <Link to={"/login"}>Login</Link>
+        )}
       </article>
     </nav>
   );
