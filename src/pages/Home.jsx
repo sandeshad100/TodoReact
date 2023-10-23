@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Header from "../components/Header";
 import axios from "axios";
-import { server } from "../main";
+import { Context, server } from "../main";
 import toast from "react-hot-toast";
 import TodoItem from "../components/TodoItem";
+import { Navigate } from "react-router-dom";
 
 const Home = () => {
   const [title, setTitle] = useState("");
@@ -11,6 +12,7 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
   const [tasks, setTask] = useState([]);
   const [refresh, setRefresh] = useState(false);
+  const { isAuthenticated } = useContext(Context);
 
   const updateHandler = async (id) => {
     console.log(id);
@@ -101,6 +103,8 @@ const Home = () => {
         toast.error(error?.response?.data?.message);
       });
   }, [refresh]);
+
+  if (!isAuthenticated) return <Navigate to={"/login"} />;
   return (
     <>
       <Header />
