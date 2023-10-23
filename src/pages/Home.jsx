@@ -10,29 +10,57 @@ const Home = () => {
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [tasks, setTask] = useState([]);
+  const [refresh, setRefresh] = useState(false);
 
-  const updateHandler = (id) => {
+  const updateHandler = async (id) => {
+    console.log(id);
     // toast.success(id);
     try {
-      const { data } = axios.put(
+      const { data } = await axios.put(
         `${server}/task/${id}`,
         {},
         { withCredentials: true }
       );
+
+      toast.success(data?.message);
+      setRefresh((prev) => !prev);
     } catch (error) {
       toast.error(error.response.data.message);
     }
   };
-  const deleteHandler = (id) => {
-    // toast.error(id);
+
+  // const deleteHandler = async (id) => {
+  //   console.log("Delete", id);
+  //   // toast.success(id);
+  //   try {
+  //     const { data } = await axios.delete(
+  //       `${server}/task/${id}`,
+  //       {},
+  //       { withCredentials: true }
+  //     );
+
+  //     toast.success(data?.message);
+  //     setRefresh((prev) => !prev);
+  //   } catch (error) {
+  //     toast.error(error.response.data.message);
+  //   }
+  // };
+
+  const deleteHandler = async (id) => {
+    console.log("Delete", id);
     try {
-      const { data } = axios.put(
-        `${server}/task/${id}`,
-        {},
-        { withCredentials: true }
-      );
+      const response = await axios.delete(`${server}/task/${id}`, {
+        withCredentials: true,
+      });
+
+      if (response.status === 200) {
+        toast.success(response.data.message);
+        setRefresh((prev) => !prev);
+      } else {
+        toast.error("An error occurred while deleting the task.");
+      }
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error("An error occurred while deleting the task.");
     }
   };
 
@@ -52,6 +80,7 @@ const Home = () => {
       setDescription("");
       toast.success(data.message);
       setLoading(false);
+      setRefresh((prev) => !prev);
     } catch (error) {
       setLoading(false);
       toast.error(error.response.data.message);
@@ -59,18 +88,19 @@ const Home = () => {
   };
 
   useEffect(() => {
+    console.log("Useeffect");
     axios
       .get(`${server}/task/my`, {
         withCredentials: true,
       })
       .then((res) => {
-        console.log(res.data.tasks);
+        // console.log("Tasks " + JSON.parse(res?.data?.tasks));
         setTask(res.data.tasks);
       })
-      .catch((e) => {
-        toast.error(e.response.data.message);
+      .catch((error) => {
+        toast.error(error?.response?.data?.message);
       });
-  }, []);
+  }, [refresh]);
   return (
     <>
       <Header />
